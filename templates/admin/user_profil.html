@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Profil utilisateur - {{ user.email }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+  <!-- En-tête -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-info fw-bold">
+      <i class="bi bi-person-circle me-2"></i> Profil utilisateur
+    </h2>
+    <a href="{{ url_for('admin.users') }}" class="btn btn-outline-light">
+      <i class="bi bi-arrow-left"></i> Retour
+    </a>
+  </div>
+
+  <!-- Bloc Avatar + Identité -->
+  <div class="card bg-dark text-light shadow mb-4">
+    <div class="card-body d-flex align-items-center">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+           class="rounded-circle me-3 border border-secondary"
+           width="100" height="100" alt="Avatar utilisateur">
+      <div>
+        <h4 class="mb-1">{{ user.email }}</h4>
+        <p class="mb-0 text-muted">ID utilisateur : {{ user.id }}</p>
+        <p class="mb-0 text-muted">Inscrit le : {{ user.created_at.strftime('%d/%m/%Y') }}</p>
+        {% if user.last_login %}
+        <p class="mb-0 text-warning">Dernière connexion : {{ user.last_login.strftime('%d/%m/%Y %H:%M') }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Informations générales -->
+  <div class="card bg-secondary text-light mb-4 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title mb-3">
+        <i class="bi bi-info-circle me-2"></i> Informations générales
+      </h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <p><strong>Rôle :</strong>
+            {% if user.is_admin %}
+              <span class="badge bg-warning text-dark">Administrateur</span>
+            {% else %}
+              <span class="badge bg-success">Utilisateur</span>
+            {% endif %}
+          </p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Statut :</strong>
+            {% if user.is_active %}
+              <span class="badge bg-success">Actif</span>
+            {% else %}
+              <span class="badge bg-danger">Inactif</span>
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="row mb-4">
+    <div class="col-md-4 mb-3">
+      <div class="card text-bg-info shadow-sm text-center p-3">
+        <h5 class="card-title">
+          <i class="bi bi-bar-chart-line me-1"></i> Total appels API
+        </h5>
+        <h3 class="fw-bold">{{ total_calls }}</h3>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card text-bg-success shadow-sm text-center p-3">
+        <h5 class="card-title">
+          <i class="bi bi-calendar-day me-1"></i> Appels aujourd'hui
+        </h5>
+        <h3 class="fw-bold">{{ today_calls }}</h3>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card text-bg-secondary shadow-sm text-center p-3">
+        <h5 class="card-title">
+          <i class="bi bi-clock-history me-1"></i> Total connexions
+        </h5>
+        <h3 class="fw-bold">{{ total_logins }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clés API associées -->
+  <div class="card bg-secondary text-light shadow">
+    <div class="card-body">
+      <h5 class="card-title mb-3">
+        <i class="bi bi-key me-2"></i> Clés API de l’utilisateur
+      </h5>
+      <table class="table table-dark table-striped table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>API Key</th>
+            <th>Créée le</th>
+            <th>Quota journalier</th>
+            <th>Révoquée</th>
+            <th>Utilisation aujourd’hui</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for key in keys %}
+            <tr>
+              <td>{{ key.id }}</td>
+              <td class="text-break">{{ key.api_key }}</td>
+              <td>{{ key.created_at.strftime('%d/%m/%Y') }}</td>
+              <td>{{ key.daily_limit }}</td>
+              <td>
+                {% if key.revoked %}
+                  <span class="text-danger fw-bold">Oui</span>
+                {% else %}
+                  <span class="text-success fw-bold">Non</span>
+                {% endif %}
+              </td>
+              <td>{{ key.today_usage }}</td>
+              <td class="d-flex gap-2">
+                {% if not key.revoked %}
+                  <form method="POST" action="{{ url_for('admin.pro_revoke', key=key.api_key) }}">
+                    <button type="submit" class="btn btn-sm btn-warning">
+                      <i class="bi bi-x-circle"></i> Révoquer
+                    </button>
+                  </form>
+                  <form method="POST" action="{{ url_for('admin.update_quota', key=key.api_key) }}">
+                    <input type="number" name="daily_limit" value="{{ key.daily_limit }}" min="1" class="form-control form-control-sm me-1" style="width:80px;">
+                    <button type="submit" class="btn btn-sm btn-info">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                  </form>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-3">
+                <i class="bi bi-exclamation-circle"></i> Aucune clé trouvée
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Historique des requêtes récentes -->
+  <div class="card bg-dark text-light shadow mt-4">
+    <div class="card-body">
+      <h5 class="card-title mb-3">
+        <i class="bi bi-clock-history me-2"></i> Activité récente
+      </h5>
+      {% if recent_logs %}
+        <ul class="list-group list-group-flush">
+          {% for log in recent_logs %}
+            <li class="list-group-item bg-secondary text-light d-flex justify-content-between align-items-center">
+              <span>{{ log.date.strftime('%d/%m/%Y %H:%M') }} → {{ log.endpoint }}</span>
+              <span class="badge bg-info">{{ log.status_code }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted mb-0"><i class="bi bi-exclamation-circle"></i> Aucune activité récente</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

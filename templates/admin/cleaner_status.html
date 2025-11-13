@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">🧹 État du Cleaner (Scheduler)</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <h5 class="mb-3">📊 Informations générales</h5>
+
+            <ul class="list-group mb-4">
+                <li class="list-group-item">
+                    <strong>Dernière exécution :</strong>
+                    {{ last_clean if last_clean else "Jamais encore exécuté" }}
+                </li>
+
+                <li class="list-group-item">
+                    <strong>Prochaine exécution :</strong>
+                    {{ job.next_run_time if job else "Indisponible" }}
+                </li>
+
+                <li class="list-group-item">
+                    <strong>Total fichiers supprimés :</strong>
+                    {{ deleted_count }}
+                </li>
+
+                <li class="list-group-item">
+                    <strong>Statut du job :</strong>
+                    {% if job %}
+                        ✅ Actif
+                    {% else %}
+                        ❌ Inactif
+                    {% endif %}
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
