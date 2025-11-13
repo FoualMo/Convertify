@@ -15,7 +15,7 @@ Werkzeug
 # --- Sécurité & Hashing ---
 bcrypt
 itsdangerous
-
+PyPDF2
 # --- Outils & Utilitaires ---
 requests
 python-dotenv
