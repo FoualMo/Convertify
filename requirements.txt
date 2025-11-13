@@ -1,21 +1,34 @@
 
 
 pdf2docx
-
+Pillow
 APScheduler
 pypdf
 
+# --- Flask & Core ---
 Flask
 Flask-Login
+Flask-SQLAlchemy
+Flask-Migrate
+Werkzeug
 
+# --- Sécurité & Hashing ---
+bcrypt
+itsdangerous
 
-
-
-
+# --- Outils & Utilitaires ---
+requests
+python-dotenv
 
 # --- Compression & Conversion (si ton app en fait) ---
 Pillow
-moviepy
+moviep
 pydub
 
+# --- Formatage / Analys ---
+beautifulsoup4
+lxml
 
+# --- Déploiement & Serveur ---
+gunicorn
+waitress
