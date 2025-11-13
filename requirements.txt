@@ -11,7 +11,7 @@ Flask-Login
 Flask-SQLAlchemy
 Flask-Migrate
 Werkzeug
-
+psutil
 # --- Sécurité & Hashing ---
 bcrypt
 itsdangerous
