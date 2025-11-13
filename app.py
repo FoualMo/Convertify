@@ -8,6 +8,8 @@ from werkzeug.security import generate_password_hash
 from config.site_config import SiteConfig
 from models.db import db  # ✅ import unique et cohérent
 from models.user import User, APIKey, RequestLog
+
+
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'un_secret_key'
@@ -78,6 +80,20 @@ def create_app():
     return app
 
 
+app = create_app()
+with app.app_context():
+        db.create_all()
+
+        # Création admin si absent
+        if not User.query.filter_by(email="admin@example.com").first():
+            admin = User(
+                email="admin@example.com",
+                password_hash=generate_password_hash("admin123"),
+                is_admin=True
+            )
+            db.session.add(admin)
+            db.session.commit()
+            print("✅ Admin ajouté", flush=True)
 # -------------------------------------------------
 # Lancement direct (et création de la base si besoin)
 # -------------------------------------------------
