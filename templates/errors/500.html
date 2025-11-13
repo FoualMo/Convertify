@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="py-5 text-center">
+  <div class="container">
+    <h1 class="display-3 fw-bold text-warning">500</h1>
+    <p class="lead">Oups ! Une erreur interne est survenue. L’équipe a été notifiée.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-info mt-3">Retour à l'accueil</a>
+  </div>
+</section>
+{% endblock %}
