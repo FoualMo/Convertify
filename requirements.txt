@@ -15,9 +15,6 @@ Flask-Login==0.6.3
 
 # --- Compression & Conversion (si ton app en fait) ---
 Pillow==10.3.0
-moviepy==1.0.3
-pydub==0.25.1
-
 # --- Déploiement & Serveur ---
 gunicorn==23.0.0
 
