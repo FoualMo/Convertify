@@ -22,7 +22,7 @@ python-dotenv
 
 # --- Compression & Conversion (si ton app en fait) ---
 Pillow
-moviep
+moviepy
 pydub
 
 # --- Formatage / Analys ---
