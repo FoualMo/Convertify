@@ -21,7 +21,6 @@ requests
 python-dotenv
 markdown
 html2text
-zipfile
 PIL
 werkzeug
 docx
