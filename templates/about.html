@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="py-5 bg-dark">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-3 text-info">À propos de Convertify</h2>
+      <p class="text-muted fs-5">
+        Convertify est une plateforme moderne et sécurisée pour convertir, compresser et gérer vos fichiers en ligne.  
+        Simple, rapide et fiable — tout ce qu’il faut pour booster votre productivité.
+      </p>
+    </div>
+
+    <!-- Section Mission -->
+    <div class="row align-items-center mb-5">
+      <div class="col-md-6">
+        <img src="/static/images/logo.png" alt="À propos de Convertify" class="img-fluid rounded shadow-sm">
+      </div>
+      <div class="col-md-6 text-start">
+        <h4 class="fw-bold mb-3 text-info">🌍 Notre mission</h4>
+        <p class="text-muted">
+          Chez <strong>Convertify</strong>, notre objectif est de simplifier la gestion des fichiers numériques pour tous.  
+          Que vous soyez étudiant, professionnel ou créateur, vous pouvez convertir, compresser et protéger vos fichiers en quelques clics, sans perdre en qualité.
+        </p>
+        <ul class="list-unstyled mt-3">
+          <li><i class="bi bi-check-circle-fill text-info me-2"></i> Conversion entre plus de 10 formats (PDF, DOCX, TXT, JPG, PNG...)</li>
+          <li><i class="bi bi-check-circle-fill text-info me-2"></i> Compression optimisée selon vos besoins</li>
+          <li><i class="bi bi-check-circle-fill text-info me-2"></i> Sécurité et confidentialité garanties</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Valeurs -->
+    <div class="text-center mb-5">
+      <h4 class="fw-bold mb-4 text-info">💡 Nos valeurs</h4>
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <i class="bi bi-lightning-charge-fill fs-1 text-info"></i>
+              <h5 class="fw-bold mt-3">Rapidité</h5>
+              <p class="text-muted">Des conversions instantanées, sans perte de qualité, pour un gain de temps maximal.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <i class="bi bi-shield-lock-fill fs-1 text-info"></i>
+              <h5 class="fw-bold mt-3">Sécurité</h5>
+              <p class="text-muted">Vos fichiers sont traités localement ou supprimés automatiquement après conversion.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <i class="bi bi-people-fill fs-1 text-info"></i>
+              <h5 class="fw-bold mt-3">Accessibilité</h5>
+              <p class="text-muted">Une interface simple, intuitive et 100 % gratuite pour tous les utilisateurs.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Équipe (optionnelle) -->
+    <div class="text-center">
+      <h4 class="fw-bold mb-4 text-info">👨‍💻 L’équipe derrière Convertify</h4>
+      <div class="row justify-content-center">
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <img src="/static/img/avatar1.png" class="rounded-circle mb-3" width="90" height="90" alt="Fondateur">
+              <h5 class="fw-bold mb-1">{{ site.FOUNDER }}</h5>
+              <p class="text-muted mb-2">Fondateur & Développeur</p>
+              <div>
+                <a href="{{site.LINKEDIN}}" class="text-info me-3"><i class="bi bi-linkedin fs-5"></i></a>
+                <a href="{{site.GITHUB}}" class="text-info"><i class="bi bi-github fs-5"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Tu peux ajouter d’autres membres ici -->
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

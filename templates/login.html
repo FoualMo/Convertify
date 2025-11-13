@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion / Inscription - Convertify{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 450px;">
+  <h2 class="text-info mb-4 text-center">Bienvenue sur Convertify</h2>
+
+  <!-- Onglets -->
+  <ul class="nav nav-tabs mb-3" id="authTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link {% if not register_active %}active{% endif %}" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">Connexion</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link {% if register_active %}active{% endif %}" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab">Inscription</button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- LOGIN -->
+    <div class="tab-pane fade {% if not register_active %}show active{% endif %}" id="login" role="tabpanel">
+      <form method="POST" action="{{ url_for('main.login') }}">
+        <div class="mb-3">
+          <label for="login-email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="login-email" name="email" required>
+        </div>
+        <div class="mb-3 position-relative">
+          <label for="login-password" class="form-label">Mot de passe</label>
+          <input type="password" class="form-control" id="login-password" name="password" required>
+          <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3" onclick="togglePassword('login-password')"></i>
+        </div>
+        <button type="submit" class="btn btn-info w-100">Se connecter</button>
+
+        {% with messages = get_flashed_messages(category_filter=['login_error']) %}
+          {% if messages %}
+            <div class="text-danger mt-2 text-center">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+      </form>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="tab-pane fade {% if register_active %}show active{% endif %}" id="register" role="tabpanel">
+      <form method="POST" action="{{ url_for('main.register') }}">
+        <div class="mb-3">
+          <label for="register-email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="register-email" name="email" required>
+        </div>
+        <div class="mb-3 position-relative">
+          <label for="register-password" class="form-label">Mot de passe</label>
+          <input type="password" class="form-control" id="register-password" name="password" required>
+          <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3" onclick="togglePassword('register-password')"></i>
+        </div>
+        <button type="submit" class="btn btn-success w-100">S’inscrire</button>
+
+        {% with messages = get_flashed_messages(category_filter=['register_error', 'register_success']) %}
+          {% for message in messages %}
+            <div class="mt-2 text-center {% if 'error' in message %}text-danger{% else %}text-success{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endwith %}
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePassword(id) {
+  const pwd = document.getElementById(id);
+  pwd.type = pwd.type === 'password' ? 'text' : 'password';
+}
+</script>
+{% endblock %}

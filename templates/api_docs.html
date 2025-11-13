@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation API - Convertify{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+
+    <!-- Titre -->
+    <h2 class="fw-bold mb-4 text-center text-info">📚 Documentation API Convertify</h2>
+    <p class="text-muted text-center mb-5">
+      Convertissez vos fichiers via notre API REST.<br>
+      Authentification via <code>X-API-KEY</code>.
+    </p>
+
+    <!-- Infos générales -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h4 class="mb-3"><i class="bi bi-info-circle me-2"></i> Informations générales</h4>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><strong>Endpoint :</strong> <code>POST /api/convert</code></li>
+          <li class="list-group-item"><strong>Authentification :</strong> Header <code>X-API-KEY</code></li>
+          <li class="list-group-item"><strong>Formats pris en charge :</strong>
+            <span class="badge bg-primary me-1">PDF</span>
+            <span class="badge bg-primary me-1">DOCX</span>
+            <span class="badge bg-primary me-1">TXT</span>
+            <span class="badge bg-primary me-1">MD</span>
+            <span class="badge bg-primary me-1">PNG</span>
+            <span class="badge bg-primary me-1">JPG</span>
+            <span class="badge bg-primary me-1">WEBP</span>
+          </li>
+          <li class="list-group-item"><strong>Quota quotidien :</strong> Selon votre abonnement</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Exemple Python -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h4 class="mb-3"><i class="bi bi-terminal me-2"></i> Exemple de requête (Python)</h4>
+        <pre class="bg-dark text-light p-3 rounded small"><code>import requests
+
+url = "https://convertify.fr/api/convert"
+headers = {"X-API-KEY": "VOTRE_CLE_API"}
+files = {"file": open("document.pdf", "rb")}
+data = {"output_format": "docx"}
+
+response = requests.post(url, headers=headers, files=files, data=data)
+if response.status_code == 200:
+    open("output.docx", "wb").write(response.content)
+else:
+    print(response.json())</code></pre>
+      </div>
+    </div>
+
+    <!-- Réponses possibles -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h4 class="mb-3"><i class="bi bi-exclamation-triangle me-2"></i> Réponses possibles</h4>
+        <pre class="bg-dark text-light p-3 rounded small"><code># Succès : fichier téléchargé
+HTTP 200 OK
+Content-Type: application/octet-stream
+
+# Erreurs JSON possibles :
+{
+  "error": "output_format required"
+}
+
+{
+  "error": "invalid API key"
+}
+
+{
+  "error": "Quota journalier dépassé"
+}
+</code></pre>
+      </div>
+    </div>
+
+    <!-- Formulaire interactif -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h4 class="mb-3"><i class="bi bi-gear me-2"></i> Testez l’API en direct</h4>
+        <form id="liveApiForm" enctype="multipart/form-data" class="row g-3">
+          <div class="col-md-4">
+            <input type="text" id="docApiKey" class="form-control" placeholder="Votre clé API" required>
+          </div>
+          <div class="col-md-4">
+            <input type="file" id="docApiFile" class="form-control" required>
+          </div>
+          <div class="col-md-3">
+            <select id="docOutputFormat" class="form-select" required>
+              <option value="pdf">PDF</option>
+              <option value="docx">DOCX</option>
+              <option value="txt">TXT</option>
+              <option value="md">MD</option>
+              <option value="png">PNG</option>
+            </select>
+          </div>
+          <div class="col-md-1">
+            <button class="btn btn-info w-100" type="submit">Go</button>
+          </div>
+        </form>
+        <pre id="docApiResult" class="bg-dark text-light mt-3 p-3 rounded small"></pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+document.getElementById("liveApiForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const apiKey = document.getElementById("docApiKey").value;
+  const file = document.getElementById("docApiFile").files[0];
+  const format = document.getElementById("docOutputFormat").value;
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("format", format.toLowerCase());
+
+
+  const resultBox = document.getElementById("docApiResult");
+  resultBox.textContent = "Requête en cours...";
+
+  try {
+    const res = await fetch("/convertify/api/convert", {
+      method: "POST",
+      headers: { "X-API-KEY": apiKey },
+      body: formData
+    });
+
+    if (res.ok && res.headers.get("Content-Type").includes("application")) {
+      resultBox.textContent = "✅ Fichier téléchargé avec succès.";
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "converted." + format;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } else {
+      const err = await res.json();
+      resultBox.textContent = JSON.stringify(err, null, 2);
+    }
+  } catch (err) {
+    resultBox.textContent = "❌ Erreur : " + err.message;
+  }
+});
+</script>
+{% endblock %}

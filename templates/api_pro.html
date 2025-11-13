@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}API Pro - Convertify{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1 class="fw-bold text-info">Convertify API Pro</h1>
+    <p class="lead text-muted">Automatisez vos conversions de fichiers en toute simplicité grâce à notre API REST sécurisée.</p>
+  </div>
+
+  <!-- Section présentation -->
+  <div class="row mb-5 align-items-center">
+    <div class="col-md-6">
+      <h3 class="fw-semibold mb-3">Pourquoi utiliser l’API Convertify ?</h3>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item bg-transparent"><i class="bi bi-lightning-charge text-warning"></i> Conversion rapide et fiable</li>
+        <li class="list-group-item bg-transparent"><i class="bi bi-shield-lock text-success"></i> API sécurisée avec clé unique</li>
+        <li class="list-group-item bg-transparent"><i class="bi bi-graph-up text-primary"></i> Suivi du quota journalier</li>
+        <li class="list-group-item bg-transparent"><i class="bi bi-code-slash text-info"></i> Facile à intégrer (Python, JavaScript, etc.)</li>
+      </ul>
+    </div>
+    <div class="col-md-6 text-center">
+      <img src="{{ url_for('static', filename='img/api_illustration.svg') }}" alt="API illustration" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+    </div>
+  </div>
+
+  <!-- Section endpoints -->
+  <div class="bg-dark text rounded-4 p-4 shadow-sm mb-5">
+    <h3 class="text-warning"><i class="bi bi-plug"></i> Endpoints principaux</h3>
+    <p class="text-muted mb-4">Exemple de requête via cURL :</p>
+
+<pre class="bg-black text-success p-3 rounded">
+curl -X POST https://votre-domaine.com/api/convert \
+  -H "X-API-KEY: VOTRE_API_KEY" \
+  -F "file=@/chemin/vers/fichier.docx" \
+  -F "output_format=pdf" \
+  -o "result.pdf"
+</pre>
+
+    <ul class="list-group list-group-flush mt-4">
+      <li class="list-group-item bg-transparent">
+        <strong>POST /api/convert</strong> — Convertit un fichier vers le format demandé.<br>
+        <small class="text-muted">Paramètres : <code>file</code>, <code>output_format</code></small>
+      </li>
+      <li class="list-group-item bg-transparent">
+        <strong>GET /api/docs</strong> — Documentation technique complète de l’API.
+      </li>
+    </ul>
+  </div>
+
+  <!-- Section clé API -->
+  <div class="text-center mb-5">
+    <h3 class="fw-semibold mb-3">Besoin d’une clé API ?</h3>
+    <p class="text-muted">Créez votre clé personnelle en quelques secondes depuis votre tableau de bord.</p>
+    <a href="{{ url_for('pro_dashboard') }}" class="btn btn-warning btn-lg px-4 shadow-sm">
+      <i class="bi bi-person-badge"></i> Accéder au tableau de bord
+    </a>
+  </div>
+
+  <!-- Section exemples d'intégration -->
+  <div class="card border-0 shadow-sm mb-5">
+    <div class="card-body">
+      <h4 class="fw-bold text-info mb-3"><i class="bi bi-code"></i> Exemple d’intégration en Python</h4>
+<pre class="bg-dark text rounded p-3"><code>import requests
+
+url = "https://votre-domaine.com/api/convert"
+headers = {"X-API-KEY": "VOTRE_API_KEY"}
+files = {"file": open("document.docx", "rb")}
+data = {"output_format": "pdf"}
+
+r = requests.post(url, headers=headers, files=files, data=data)
+open("output.pdf", "wb").write(r.content)
+print("Conversion réussie !")</code></pre>
+    </div>
+  </div>
+
+  <!-- Section support -->
+  <div class="text-center">
+    <h5 class="text-muted mb-3">Une question ou un bug ?</h5>
+    <a href="{{ url_for('contact') }}" class="btn btn-outline-info">
+      <i class="bi bi-envelope"></i> Contacter le support technique
+    </a>
+  </div>
+</div>
+{% endblock %}

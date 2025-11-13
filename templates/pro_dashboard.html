@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord Pro - Convertify{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+  <!-- Titre et résumé -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="text-info fw-bold">Tableau de bord Pro</h2>
+      <p class="text-light-50">Gérez les clés API, les quotas et les utilisateurs autorisés à accéder à vos services.</p>
+    </div>
+    <a href="{{ url_for('admin.export_keys_csv') }}" class="btn btn-outline-warning">
+      <i class="bi bi-download"></i> Exporter les données
+    </a>
+  </div>
+
+  <!-- Statistiques globales -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card bg-dark text-light text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="text-secondary text-uppercase">Total Clés</h6>
+          <h3>{{ total_keys or 0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-dark text-light text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="text-secondary text-uppercase">Actives</h6>
+          <h3 class="text-success">{{ active_keys or 0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-dark text-light text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="text-secondary text-uppercase">Révoquées</h6>
+          <h3 class="text-danger">{{ revoked_keys or 0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-dark text-light text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="text-secondary text-uppercase">Appels totaux aujourd'hui</h6>
+          <h3 class="text-info">{{ total_requests_today or 0 }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulaire création -->
+  <div class="card bg-secondary text-light mb-5 shadow">
+    <div class="card-body">
+      <h5 class="card-title"><i class="bi bi-key"></i> Générer une nouvelle API Key</h5>
+      <form method="POST" action="{{ url_for('admin.create_key') }}">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="email" class="form-label">Utilisateur</label>
+            <select class="form-select select2" id="email" name="email" required>
+              <option value="" selected disabled>Choisir un utilisateur...</option>
+              {% for email in users %}
+                <option value="{{ email }}">{{ email }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="daily_limit" class="form-label">Quota journalier</label>
+            <input type="number" class="form-control" id="daily_limit" name="daily_limit" value="100" min="1">
+          </div>
+
+          <div class="col-md-2 d-flex align-items-end mb-3">
+            <button type="submit" class="btn btn-info w-100">
+              <i class="bi bi-plus-circle"></i> Créer
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Outils de recherche -->
+  <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+    <form method="GET" action="{{ url_for('admin.dashboard') }}" class="d-flex gap-2">
+      <input type="text" name="search_email" class="form-control" placeholder="🔍 Rechercher un email..." value="{{ request.args.get('search_email', '') }}">
+      <button class="btn btn-outline-info">Rechercher</button>
+    </form>
+
+    <form method="GET" action="{{ url_for('admin.dashboard') }}" class="d-flex gap-2">
+      <select name="status_filter" class="form-select">
+        <option value="" {% if request.args.get('status_filter') == '' %}selected{% endif %}>Toutes les clés</option>
+        <option value="active" {% if request.args.get('status_filter') == 'active' %}selected{% endif %}>Actives</option>
+        <option value="revoked" {% if request.args.get('status_filter') == 'revoked' %}selected{% endif %}>Révoquées</option>
+      </select>
+      <button class="btn btn-outline-info">Filtrer</button>
+    </form>
+  </div>
+
+  <!-- Tableau -->
+  <div class="card bg-dark text-light shadow">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="card-title"><i class="bi bi-list-ul"></i> Liste des clés API</h5>
+        <span class="text-secondary small">Total : {{ keys|length }}</span>
+      </div>
+
+      <table class="table table-dark table-hover align-middle table-bordered border-secondary">
+        <thead class="table-light text-dark">
+          <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>API Key</th>
+            <th>Créée le</th>
+            <th>Quota journalier</th>
+            <th>Utilisation</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for key in keys %}
+            <tr>
+              <td>{{ key.id }}</td>
+              <td>{{ key.user_id }}</td>
+              <td class="text-break"><code>{{ key.api_key }}</code></td>
+              <td>{{ key.created_at.strftime('%d/%m/%Y') if key.created_at else '—' }}</td>
+              <td>
+                {% if not key.revoked %}
+                  <form method="POST" action="{{ url_for('admin.update_quota', key=key.api_key) }}" class="d-flex gap-2">
+                    <input type="number" name="daily_limit" value="{{ key.daily_limit }}" min="1" class="form-control form-control-sm text-center">
+                    <button type="submit" class="btn btn-sm btn-outline-info">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                  </form>
+                {% else %}
+                  <span class="text-muted">{{ key.daily_limit }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-info">{{ key.today_usage or 0 }}</span>
+              </td>
+              <td>
+                {% if key.revoked %}
+                  <span class="badge bg-danger">Révoquée</span>
+                {% else %}
+                  <span class="badge bg-success">Active</span>
+                {% endif %}
+              </td>
+              <td class="d-flex gap-2">
+                {% if not key.revoked %}
+                  <form method="POST" action="{{ url_for('admin.pro_revoke', key=key.api_key) }}" onsubmit="return confirm('Confirmer la révocation de cette clé ?');">
+                    <button type="submit" class="btn btn-sm btn-warning">
+                      <i class="bi bi-x-circle"></i> Révoquer
+                    </button>
+                  </form>
+                {% endif %}
+                <a href="/admin/users/{{ key.user_id }}" class="btn btn-sm btn-outline-light">
+                  <i class="bi bi-person-lines-fill"></i> Profil
+                </a>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-muted py-4">
+                <i class="bi bi-emoji-neutral"></i> Aucune clé trouvée
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- 🦸‍♂️ HERO SECTION -->
+<section class="hero text-center py-5">
+  <div class="container">
+    <h1 class="display-4 fw-bold mb-3">
+      Transformez vos fichiers <span class="text-gradient">facilement</span>
+    </h1>
+    <p class="lead text-muted mb-4">
+      Convertify vous permet de convertir ou compresser vos fichiers (PDF, DOCX, JPG, PNG...) — simple, rapide et sécurisé.
+    </p>
+    <!-- On peut mettre un CTA vers la page de compression si tu veux -->
+    <a href="{{ url_for('main.compression') }}" class="btn btn-info btn-lg px-4 py-2 shadow-sm">
+      🗜️ Compresser un fichier
+    </a>
+  </div>
+</section>
+
+<!-- ⚡ FEATURES SECTION -->
+<section class="features py-5 text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-4 text-gradient">Pourquoi choisir Convertify ?</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 p-4 border-0 shadow-sm hover-scale">
+          <div class="fs-1 mb-3">⚙️</div>
+          <h5 class="fw-bold">Formats multiples</h5>
+          <p class="text-muted">
+            Convertissez vos documents, images et PDF en un large choix de formats populaires.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 p-4 border-0 shadow-sm hover-scale">
+          <div class="fs-1 mb-3">⚡</div>
+          <h5 class="fw-bold">Rapide & efficace</h5>
+          <p class="text-muted">
+            Que ce soit pour la conversion ou la compression, vos fichiers sont traités en un instant.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 p-4 border-0 shadow-sm hover-scale">
+          <div class="fs-1 mb-3">🔒</div>
+          <h5 class="fw-bold">Sécurité garantie</h5>
+          <p class="text-muted">
+            Vos fichiers ne sont jamais stockés — la confidentialité est notre priorité.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 💡 CALL TO ACTION -->
+<section class="cta text-center py-5">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Prêt à commencer ?</h2>
+    <p class="mb-4 text-muted">
+      Essayez Convertify gratuitement et simplifiez vos conversions ou compressions dès aujourd’hui.
+    </p>
+    <a href="{{ url_for('main.compression') }}" class="btn btn-info btn-lg shadow-sm hover-scale">
+      🗜️ Compresser un fichier
+    </a>
+  </div>
+</section>
+
+<style>
+.hover-scale {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-scale:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+.text-gradient {
+  background: linear-gradient(90deg,#6a11cb,#2575fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+</style>
+
+{% endblock %}

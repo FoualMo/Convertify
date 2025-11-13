@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="py-5" style="background: linear-gradient(135deg,#0e0e12,#1c1c26); min-height: 100vh;">
+  <div class="container">
+    <h2 class="text-gradient text-center mb-5">Boîte à outils</h2>
+
+    <div class="mx-auto" style="max-width: 500px;">
+      <form id="tools-form" action="{{ url_for('tools') }}" method="POST" enctype="multipart/form-data" class="drop-zone p-5 rounded shadow text-center">
+        <p id="file-name" class="mb-3 text-light">Glissez un fichier ici ou cliquez pour choisir</p>
+        <input type="file" name="file" id="file-upload" required>
+        <button type="submit" class="btn btn-success w-100 mt-3">Analyser</button>
+      </form>
+
+      <div id="loader" class="text-center mt-4" style="display:none;">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-light mt-2">Analyse en cours...</p>
+      </div>
+    </div>
+
+    {% if stats %}
+    <div class="mt-5 row justify-content-center text-light">
+      <div class="col-md-6">
+        <div class="card bg-dark p-4 shadow mb-3">
+          <h5>Statistiques</h5>
+          {% if stats.pages %}<p>Pages : {{ stats.pages }}</p>{% endif %}
+          {% if stats.words %}<p>Mots : {{ stats.words }}</p>{% endif %}
+          {% if stats.lines %}<p>Lignes : {{ stats.lines }}</p>{% endif %}
+          {% if stats.preview %}<p>Aperçu : <pre>{{ stats.preview }}</pre></p>{% endif %}
+          {% if stats.message %}<p>{{ stats.message }}</p>{% endif %}
+          {% if stats.error %}<p class="text-danger">{{ stats.error }}</p>{% endif %}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card bg-dark p-4 shadow mb-3">
+          <h5>Actions disponibles</h5>
+          <ul>
+            {% if file_type == "pdf" %}
+            <li>Convertir</li>
+            <li>Compresser</li>
+            <li>Fusionner</li>
+            <li>Diviser</li>
+            <li>Ajouter filigrane</li>
+            {% elif file_type == "text" %}
+            <li>Convertir</li>
+            <li>Exporter en PDF / Markdown</li>
+            {% elif file_type == "image" %}
+            <li>Redimensionner</li>
+            <li>Compresser</li>
+            <li>Convertir format</li>
+            {% else %}
+            <li>Aucune action disponible</li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+const fileInput = document.getElementById("file-upload");
+const fileNameDisplay = document.getElementById("file-name");
+const form = document.getElementById("tools-form");
+const loader = document.getElementById("loader");
+
+// Drag & Drop feedback
+const dropZone = form;
+dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("border-primary");
+});
+dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("border-primary");
+});
+
+fileInput.addEventListener("change", () => {
+    if(fileInput.files.length > 0){
+        fileNameDisplay.textContent = fileInput.files[0].name;
+    } else {
+        fileNameDisplay.textContent = "Glissez un fichier ici ou cliquez pour choisir";
+    }
+});
+
+form.addEventListener("submit", () => {
+    loader.style.display = "block";
+});
+</script>
+
+<style>
+.drop-zone {
+    background: rgba(255,255,255,0.05);
+    border: 2px dashed #00bcd4;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.drop-zone:hover {
+    background: rgba(255,255,255,0.1);
+}
+.border-primary {
+    border-color: #00bcd4 !important;
+}
+.card pre {
+    background: rgba(255,255,255,0.05);
+    padding: 10px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+</style>
+
+{% endblock %}

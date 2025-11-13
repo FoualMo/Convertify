@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="py-5 bg-dark">
+  <div class="container">
+    <div class="row justify-content-center">
+      <!-- Colonne gauche : Infos de contact -->
+      <div class="col-lg-5 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body text-start">
+            <h3 class="fw-bold mb-3 text-info">Contactez-nous</h3>
+            <p class="text-muted mb-4">
+              Vous avez une question, une suggestion ou un partenariat à proposer ?  
+              Remplissez le formulaire ou contactez-nous directement via les informations ci-dessous.
+            </p>
+
+            <ul class="list-unstyled">
+              <li class="mb-3"><i class="bi bi-envelope-fill text-info me-2"></i>
+                <strong>Email :</strong> {{ site.MAIL }}
+              </li>
+              <li class="mb-3"><i class="bi bi-telephone-fill text-info me-2"></i>
+                <strong>Téléphone :</strong> {{ site.INDICATIF }} {{ site.PHONE_NUMBER }}
+              </li>
+              <li class="mb-3"><i class="bi bi-geo-alt-fill text-info me-2"></i>
+                <strong>Adresse :</strong> {{ site.ADRESS }}
+              </li>
+              <li class="mt-4">
+              <a href="{{ site.FACEBOOK }}" target="_blank" class="text-info me-3" title="Facebook">
+                <i class="bi bi-facebook fs-4"></i>
+              </a>
+              <a href="{{ site.INSTAGRAM }}" target="_blank" class="text-info me-3" title="Instagram">
+                <i class="bi bi-instagram fs-4"></i>
+              </a>
+              <a href="{{ site.TWITTER }}" target="_blank" class="text-info" title="Twitter / X">
+                <i class="bi bi-twitter-x fs-4"></i>
+              </a>
+            </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Colonne droite : Formulaire -->
+      <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <h4 class="fw-bold mb-3">Envoyez un message</h4>
+            <form action="/contact" method="POST" enctype="multipart/form-data">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <input class="form-control" type="text" name="name" placeholder="Nom complet" required>
+                </div>
+                <div class="col-md-6">
+                  <input class="form-control" type="email" name="email" placeholder="Email" required>
+                </div>
+
+                <div class="col-12">
+                  <select class="form-select" name="subject" required>
+                    <option value="">Sélectionnez un sujet</option>
+                    <option value="support">Support technique</option>
+                    <option value="collaboration">Collaboration</option>
+                    <option value="partenariat">Partenariat</option>
+                    <option value="autre">Autre</option>
+                  </select>
+                </div>
+
+                <div class="col-12">
+                  <textarea class="form-control" name="message" placeholder="Votre message..." rows="5" required></textarea>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label text-muted">Joindre un fichier (optionnel)</label>
+                  <input class="form-control" type="file" name="attachment">
+                </div>
+
+                <div class="col-12 form-check text-start mt-2">
+                  <input type="checkbox" class="form-check-input" id="copy" name="copy">
+                  <label for="copy" class="form-check-label text-muted">Recevoir une copie du message</label>
+                </div>
+
+                <div class="col-12 mt-3">
+                  <button type="submit" class="btn btn-info w-100 py-2">
+                    <i class="bi bi-send-fill me-2"></i>Envoyer le message
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Optionnel : animation ou toast de confirmation -->
+<script>
+document.querySelector("form").addEventListener("submit", (e) => {
+  const btn = e.target.querySelector("button");
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Envoi...';
+});
+
+document.querySelector("form").addEventListener("submit", (e) => {
+  const btn = e.target.querySelector("button");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Envoi...';
+});
+
+
+</script>
+{% endblock %}

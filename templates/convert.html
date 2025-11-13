@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="py-5 position-relative overflow-hidden">
+  <canvas id="particle-canvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;"></canvas>
+
+  <div class="container text-center position-relative" style="z-index:2;">
+    <h2 class="mb-4 text-gradient">Convertisseur de fichiers</h2>
+    <p class="text-muted mb-5">Glissez un fichier ou cliquez pour sélectionner, puis choisissez le format de sortie.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form id="convert-form" action="{{ url_for('convert.convert_file') }}" method="POST" enctype="multipart/form-data"
+          class="mx-auto p-4 rounded-4 shadow-lg bg-gradient-to-r from-indigo-900 to-indigo-800 text-light" style="max-width:500px;">
+
+      <!-- Drag & Drop -->
+      <div id="drop-area" class="mb-3 p-4 border border-dashed rounded-3" style="cursor:pointer;">
+        <p id="drop-text">Glissez-déposez un fichier ici ou cliquez</p>
+        <input type="file" name="file" id="file-upload" accept=".pdf,.docx,.txt" hidden required>
+      </div>
+      <p id="file-name" class="small">Aucun fichier choisi</p>
+
+      <select name="output_format" class="form-select mb-3" id="output-format" required>
+        <option value="" disabled selected>Choisir le format de sortie</option>
+      </select>
+
+      <button type="submit" class="btn btn-success w-100 py-2">Convertir</button>
+    </form>
+
+    <!-- Loader -->
+    <div id="loader" style="display:none; margin-top:30px;">
+      <div class="progress mx-auto" style="max-width:300px; height:25px;">
+        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+             style="width:0%">0%</div>
+      </div>
+      <p class="mt-2">Conversion en cours...</p>
+    </div>
+
+    <!-- Succès -->
+    <div id="success-feedback" style="display:none; margin-top:30px;">
+      <div class="checkmark animate-check mb-2"></div>
+      <p class="text-success fs-5 mb-3">Conversion réussie !</p>
+      <a id="download-link" href="#" class="btn btn-primary">Télécharger le fichier</a>
+    </div>
+  </div>
+</section>
+
+<style>
+#drop-area {
+  background: rgba(255,255,255,0.1);
+  border: 2px dashed #fff;
+  border-radius: 12px;
+  transition: background 0.3s, transform 0.2s;
+}
+#drop-area.hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.02);
+}
+
+.checkmark {
+  width:60px; height:60px; border-radius:50%;
+  display:inline-block; border:4px solid #28a745;
+  position:relative; transform:scale(0);
+}
+.checkmark::after {
+  content:''; position:absolute; left:18px; top:30px;
+  width:12px; height:24px; border-right:4px solid #28a745;
+  border-bottom:4px solid #28a745; transform:rotate(45deg); opacity:0;
+}
+.animate-check {
+  animation: pop 0.5s forwards, draw-check 0.5s 0.5s forwards;
+}
+@keyframes pop { 0%{transform:scale(0);} 50%{transform:scale(1.2);} 100%{transform:scale(1);} }
+@keyframes draw-check { 0%{opacity:0;} 100%{opacity:1;} }
+
+canvas#particle-canvas {
+  display:block;
+  background: linear-gradient(135deg, #0e0e12 0%, #1c1c26 100%);
+}
+</style>
+
+<script>
+// =========================
+// DRAG & DROP + FORMAT LOGIC
+// =========================
+const fileInput = document.getElementById('file-upload');
+const fileNameDisplay = document.getElementById('file-name');
+const outputSelect = document.getElementById('output-format');
+const dropArea = document.getElementById('drop-area');
+
+const formats = ["docx", "pdf", "txt", "md"];
+
+// Empêcher comportement par défaut
+["dragenter","dragover","dragleave","drop"].forEach(e => {
+  dropArea.addEventListener(e, ev => ev.preventDefault());
+});
+
+// Effets visuels
+["dragenter","dragover"].forEach(e => {
+  dropArea.addEventListener(e, () => dropArea.classList.add("hover"));
+});
+["dragleave","drop"].forEach(e => {
+  dropArea.addEventListener(e, () => dropArea.classList.remove("hover"));
+});
+
+// Drop
+dropArea.addEventListener("drop", e => {
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    fileInput.files = files;
+    updateFileInfo();
+  }
+});
+
+// Click → ouvrir
+dropArea.addEventListener("click", () => fileInput.click());
+
+// Sélection normale
+fileInput.addEventListener("change", updateFileInfo);
+
+function updateFileInfo() {
+  if (fileInput.files.length === 0) return;
+  const name = fileInput.files[0].name;
+  fileNameDisplay.textContent = name;
+
+  const ext = name.split(".").pop().toLowerCase();
+
+  outputSelect.innerHTML = `<option disabled selected>Choisir le format de sortie</option>`;
+
+  formats.forEach(fmt => {
+    if (fmt !== ext) {
+      outputSelect.innerHTML += `<option value="${fmt}">${fmt.toUpperCase()}</option>`;
+    }
+  });
+}
+
+
+// =========================
+// SUBMIT FORM + PROGRESS
+// =========================
+const form = document.getElementById('convert-form');
+const loader = document.getElementById('loader');
+const progressBar = document.getElementById('progress-bar');
+const successFeedback = document.getElementById('success-feedback');
+const downloadLink = document.getElementById('download-link');
+
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+
+  if (fileInput.files.length === 0 || outputSelect.value === "") {
+    alert("Veuillez choisir un fichier et un format.");
+    return;
+  }
+
+  loader.style.display = "block";
+  successFeedback.style.display = "none";
+  progressBar.style.width = "0%";
+  progressBar.textContent = "0%";
+
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch(form.action, {
+      method: "POST",
+      body: formData
+    });
+
+    if (!response.ok) throw new Error("Erreur lors de la conversion");
+
+    // Simulation progression
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 10;
+      if (progress >= 100) progress = 100;
+
+      progressBar.style.width = progress + "%";
+      progressBar.textContent = Math.floor(progress) + "%";
+
+      if (progress === 100) clearInterval(interval);
+    }, 200);
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+
+    downloadLink.href = url;
+    downloadLink.download =
+      fileInput.files[0].name.split(".")[0] + "." + outputSelect.value;
+
+    setTimeout(() => {
+      loader.style.display = "none";
+      successFeedback.style.display = "block";
+
+      document.querySelector(".checkmark").classList.add("animate-check");
+    }, 1000);
+
+  } catch (err) {
+    loader.style.display = "none";
+    alert("Erreur : " + err.message);
+  }
+});
+</script>
+
+{% endblock %}

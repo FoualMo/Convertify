@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+{% block title %}Mon Profil - Convertify{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+  <!-- 👤 En-tête Profil -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-info fw-bold">Mon Profil</h2>
+    <span class="badge text-bg-secondary p-2">Connecté : {{ current_user.email }}</span>
+  </div>
+
+  <!-- Accordéon principal pour sections admin -->
+  <div class="accordion" id="adminAccordion">
+
+    <!-- 🔑 Clés API -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingKeys">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseKeys" aria-expanded="true" aria-controls="collapseKeys">
+          🔑 Mes Clés API
+        </button>
+      </h2>
+      <div id="collapseKeys" class="accordion-collapse collapse show" aria-labelledby="headingKeys" data-bs-parent="#adminAccordion">
+        <div class="accordion-body">
+          {% if keys %}
+          <div class="table-responsive">
+            <table class="table table-dark table-striped align-middle text-center" id="keys-table">
+              <thead>
+                <tr>
+                  <th>Clé API</th>
+                  <th>Quota</th>
+                  <th>Utilisation</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for key in keys %}
+                <tr>
+                  <td><code>{{ key.api_key }}</code></td>
+                  <td>{{ key.daily_limit }}</td>
+                  <td>{{ key.today_usage or 0 }}</td>
+                  <td>
+                    <span class="badge {{ 'bg-success' if not key.revoked else 'bg-danger' }}">
+                      {{ 'Active' if not key.revoked else 'Révoquée' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-info copy-btn" data-key="{{ key.api_key }}">Copier</button>
+                    {% if not key.revoked %}
+                    <button class="btn btn-sm btn-outline-danger revoke-btn" data-id="{{ key.id }}">Révoquer</button>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-muted">Vous n'avez pas encore créé de clé API.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if current_user.is_admin %}
+
+    <!-- 📊 Statistiques générales -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingStats">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStats" aria-expanded="false" aria-controls="collapseStats">
+          📊 Statistiques & Endpoints
+        </button>
+      </h2>
+      <div id="collapseStats" class="accordion-collapse collapse" aria-labelledby="headingStats" data-bs-parent="#adminAccordion">
+        <div class="accordion-body">
+
+          <!-- Cartes statistiques -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-3">
+              <div class="card bg-dark text-light text-center p-3 shadow">
+                <i class="bi bi-people fs-2 text-info"></i>
+                <h6>Utilisateurs totaux</h6>
+                <h3 class="fw-bold text-info">{{ stats.total_users }}</h3>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-dark text-light text-center p-3 shadow">
+                <i class="bi bi-person-check fs-2 text-success"></i>
+                <h6>Actifs</h6>
+                <h3 class="fw-bold text-success">{{ stats.active_users }}</h3>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-dark text-light text-center p-3 shadow">
+                <i class="bi bi-key fs-2 text-warning"></i>
+                <h6>Clés API</h6>
+                <h3 class="fw-bold text-warning">{{ stats.total_keys }}</h3>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-dark text-light text-center p-3 shadow">
+                <i class="bi bi-graph-up fs-2 text-primary"></i>
+                <h6>Requêtes 7 derniers jours</h6>
+                <h3 class="fw-bold text-primary">{{ stats.requests_7_days }}</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Endpoints -->
+          <div class="card bg-dark text-light shadow mb-4 p-3">
+            <h5 class="text-info mb-2">🔝 Endpoints les plus utilisés</h5>
+            {% if stats.top_endpoints %}
+            <table class="table table-dark table-striped text-center mb-0">
+              <thead>
+                <tr>
+                  <th>Endpoint</th>
+                  <th>Nombre d’appels</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for endpoint, count in stats.top_endpoints %}
+                <tr>
+                  <td><code>{{ endpoint }}</code></td>
+                  <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">Aucune donnée enregistrée.</p>
+            {% endif %}
+          </div>
+
+          <!-- Top utilisateurs par requêtes -->
+          <div class="card bg-dark text-light shadow mb-4 p-3">
+            <h5 class="text-info mb-2">👤 Top utilisateurs (nombre de requêtes)</h5>
+            {% if stats.top_users %}
+            <table class="table table-dark table-striped text-center mb-0">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Requêtes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for email, count in stats.top_users %}
+                <tr>
+                  <td>{{ email }}</td>
+                  <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">Aucune donnée pour le moment.</p>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 🧑‍💼 Gestion utilisateurs -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingUsers">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUsers" aria-expanded="false" aria-controls="collapseUsers">
+          🧑‍💼 Gestion des Utilisateurs
+        </button>
+      </h2>
+      <div id="collapseUsers" class="accordion-collapse collapse" aria-labelledby="headingUsers" data-bs-parent="#adminAccordion">
+        <div class="accordion-body">
+          <input id="search-user" type="text" placeholder="Rechercher..." class="form-control form-control-sm mb-3 w-25">
+          <div class="table-responsive">
+            <table class="table table-dark table-striped align-middle text-center" id="users-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nom</th>
+                  <th>Email</th>
+                  <th>Rôle</th>
+                  <th>État</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in users %}
+                <tr data-id="{{ user.id }}">
+                  <td>{{ user.id }}</td>
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>
+                    <span class="badge {{ 'bg-warning text-dark' if user.is_admin else 'bg-secondary' }}">
+                      {{ 'Admin' if user.is_admin else 'Utilisateur' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge {{ 'bg-success' if user.is_active else 'bg-danger' }}">
+                      {{ 'Actif' if user.is_active else 'Inactif' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-warning toggle-role">Changer rôle</button>
+                    <button class="btn btn-sm btn-outline-secondary toggle-active">
+                      {{ 'Désactiver' if user.is_active else 'Activer' }}
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger delete-user">Supprimer</button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- 🧩 Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Copier clé API
+  document.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      navigator.clipboard.writeText(btn.dataset.key);
+      btn.textContent = "Copiée !";
+      setTimeout(() => btn.textContent = "Copier", 1000);
+    });
+  });
+
+  // Révoquer clé API
+  document.querySelectorAll(".revoke-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      if (!confirm("Révoquer cette clé ?")) return;
+      const res = await fetch(`/api/revoke_key/${id}`, { method: "POST" });
+      if (res.ok) location.reload();
+    });
+  });
+
+  // Filtre instantané des utilisateurs
+  const searchInput = document.getElementById("search-user");
+  searchInput?.addEventListener("input", e => {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll("#users-table tbody tr").forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(term) ? "" : "none";
+    });
+  });
+
+  // Actions admin : toggle rôle / actif / supprimer
+  document.querySelectorAll("#users-table").forEach(table => {
+    table.addEventListener("click", async e => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      const row = btn.closest("tr");
+      const userId = row.dataset.id;
+
+      if (btn.classList.contains("toggle-role")) {
+        const res = await fetch(`/admin/users/${userId}/role`, { method: "POST" });
+        if (res.ok) location.reload();
+      }
+      if (btn.classList.contains("toggle-active")) {
+        const res = await fetch(`/admin/users/${userId}/toggle`, { method: "POST" });
+        if (res.ok) location.reload();
+      }
+      if (btn.classList.contains("delete-user")) {
+        if (!confirm("Supprimer cet utilisateur ?")) return;
+        const res = await fetch(`/admin/users/${userId}/delete`, { method: "POST" });
+        if (res.ok) row.remove();
+      }
+    });
+  });
+
+});
+</script>
+{% endblock %}

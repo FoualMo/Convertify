@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block content %}
+<body class="bg-light">
+<div class="container mt-5">
+    <h1 class="mb-4">Monitoring API</h1>
+
+    <!-- Alert erreurs -->
+    <div id="metrics-alert" class="alert alert-danger d-none"></div>
+
+    <!-- Statut de l'API -->
+    <div class="mb-3">
+        <strong>Statut API : </strong>
+        <span id="api-status" class="fw-bold">...</span>
+    </div>
+
+    <!-- Dernière mise à jour -->
+    <div class="mb-3">
+        <strong>Dernière mise à jour : </strong>
+        <span id="last-refresh">...</span>
+    </div>
+
+    <!-- Cartes indicateurs système -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">CPU</h5>
+                    <p class="card-text"><span id="cpu-percent">0%</span></p>
+                    <div class="progress">
+                        <div id="cpu-bar" class="progress-bar bg-dark" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Mémoire</h5>
+                    <p class="card-text"><span id="memory-percent">0%</span></p>
+                    <div class="progress">
+                        <div id="memory-bar" class="progress-bar bg-dark" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Disque</h5>
+                    <p class="card-text"><span id="disk-percent">0%</span></p>
+                    <div class="progress">
+                        <div id="disk-bar" class="progress-bar bg-dark" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Requests</h5>
+                    <p class="card-text"><span id="requests-count">0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Infos système supplémentaires -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Système</h5>
+                    <p><strong>Plateforme : </strong><span id="platform">-</span></p>
+                    <p><strong>Version : </strong><span id="platform-version">-</span></p>
+                    <p><strong>Uptime (s) : </strong><span id="uptime">0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function fetchMetrics() {
+    const apiStatusSpan = document.getElementById("api-status");
+
+    try {
+        const res = await fetch("/admin/metrics");
+        if (!res.ok) throw new Error("Erreur lors du fetch");
+
+        const data = await res.json();
+
+        // API ONLINE
+        apiStatusSpan.textContent = "🟢 ONLINE";
+        apiStatusSpan.style.color = "green";
+
+        if (data.error) {
+            const alertDiv = document.getElementById("metrics-alert");
+            alertDiv.textContent = data.error;
+            alertDiv.classList.remove("d-none");
+            return;
+        } else {
+            document.getElementById("metrics-alert").classList.add("d-none");
+        }
+
+        const date = new Date(data.timestamp * 1000);
+        const formattedTimestamp = date.toLocaleDateString() + " " + date.toLocaleTimeString();
+        document.getElementById("last-refresh").textContent = formattedTimestamp;
+
+        // Mise à jour des cartes
+        document.getElementById("cpu-percent").textContent = data.system.cpu_percent + "%";
+        document.getElementById("cpu-bar").style.width = data.system.cpu_percent + "%";
+
+        document.getElementById("memory-percent").textContent = data.system.memory_percent + "%";
+        document.getElementById("memory-bar").style.width = data.system.memory_percent + "%";
+
+        document.getElementById("disk-percent").textContent = data.system.disk_usage_percent + "%";
+        document.getElementById("disk-bar").style.width = data.system.disk_usage_percent + "%";
+
+        document.getElementById("requests-count").textContent = data.requests;
+
+        document.getElementById("platform").textContent = data.system.platform;
+        document.getElementById("platform-version").textContent = data.system.platform_version;
+        document.getElementById("uptime").textContent = data.uptime_seconds;
+
+    } catch (err) {
+        console.error(err);
+        apiStatusSpan.textContent = "🔴 OFFLINE";
+        apiStatusSpan.style.color = "red";
+
+        const alertDiv = document.getElementById("metrics-alert");
+        alertDiv.textContent = "Impossible de récupérer les metrics.";
+        alertDiv.classList.remove("d-none");
+    }
+}
+
+// Rafraîchissement toutes les 30 secondes
+fetchMetrics();
+setInterval(fetchMetrics, 30000);
+</script>
+</body>
+{% endblock %}
