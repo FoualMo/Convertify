@@ -21,7 +21,6 @@ requests
 python-dotenv
 markdown
 html2text
-PIL
 werkzeug
 docx
 fpdf
