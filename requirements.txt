@@ -5,7 +5,8 @@ pdf2docx
 APScheduler
 pypdf
 
-Flask==3.0.3
+Flask
+Flask-Login
 
 
 
@@ -13,7 +14,8 @@ Flask==3.0.3
 
 
 # --- Compression & Conversion (si ton app en fait) ---
-Pillow==10.3.0
-# --- Déploiement & Serveur ---
-gunicorn==23.0.0
+Pillow
+moviepy
+pydub
+
 
