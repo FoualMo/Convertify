@@ -3,7 +3,7 @@ class SiteConfig:
     SITE_NAME = "Convertify"
     SITE_DESCRIPTION = "Convertisseur et compresseur de fichiers en ligne"
     SITE_URL = "https://convertify.example.com"
-    FOUNDER = "zouk llil"
+    FOUNDER = "Mohamed Idir"
     SUPPORT_EMAIL = "support@convertify.example.com"
     MAIL = "admin@example.com"
     INDICATIF = "+33"
