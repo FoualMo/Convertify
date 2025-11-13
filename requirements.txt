@@ -19,6 +19,16 @@ PyPDF2
 # --- Outils & Utilitaires ---
 requests
 python-dotenv
+markdown
+html2text
+zipfile
+PIL
+werkzeug
+docx
+fpdf
+
+pdfplumber
+
 
 # --- Compression & Conversion (si ton app en fait) ---
 Pillow
