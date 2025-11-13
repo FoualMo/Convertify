@@ -1,0 +1,100 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm fixed-top">
+  <div class="container">
+    <!-- Logo / Nom -->
+    <a class="navbar-brand d-flex align-items-center fw-bold text-info" href="{{ url_for('main.index') }}">
+      <i class="bi bi-lightning-charge-fill me-2 text-warning"></i> Convertify
+    </a>
+
+    <!-- Bouton burger pour mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Liens de navigation -->
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav align-items-lg-center">
+
+        <!-- Pages principales -->
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('main.index') }}">
+            <i class="bi bi-house-door me-1"></i> Accueil
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'convert' %}active{% endif %}" href="{{ url_for('main.convertion') }}">
+            <i class="bi bi-file-earmark-arrow-down me-1"></i> Convertir
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'compress' %}active{% endif %}" href="{{ url_for('main.compression') }}">
+            <i class="bi bi-file-zip me-1"></i> Compresser
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'tools' %}active{% endif %}" href="{{ url_for('main.index') }}">
+            <i class="bi bi-tools me-1"></i> Outils
+          </a>
+        </li>
+
+        <!-- Espace Pro (uniquement si connecté) -->
+        {% if current_user.is_authenticated %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="proDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-gear me-1"></i> Espace Pro
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="proDropdown">
+            {% if current_user.is_admin %}
+            <li><a class="dropdown-item" href="{{ url_for('admin.pro_dashboard') }}">Tableau de bord</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin.monitoring') }}">Monitoring</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin.cleaner_status') }}">Cleaner</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin.users') }}">Utilisateurs</a></li>
+            {% endif %}
+            <li><a class="dropdown-item" href="{{ url_for('main.docs') }}">Documentation API</a></li>
+          </ul>
+        </li>
+        {% endif %}
+
+        <!-- À propos / Contact -->
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'about' %}active{% endif %}" href="{{ url_for('main.about') }}">
+            <i class="bi bi-info-circle me-1"></i> À propos
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}" href="{{ url_for('main.contact') }}">
+            <i class="bi bi-envelope me-1"></i> Contact
+          </a>
+        </li>
+
+        <!-- Connexion / Inscription ou Profil -->
+        {% if current_user.is_authenticated %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle me-1"></i> {{ current_user.email }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="{{ url_for('main.profil') }}">Profil</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('auth_bp.logout_postt') }}">Déconnexion</a></li>
+          </ul>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'login' %}active{% endif %}" href="{{ url_for('main.login') }}">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Connexion
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'register' %}active{% endif %}" href="{{ url_for('main.register') }}">
+            <i class="bi bi-pencil-square me-1"></i> S'inscrire
+          </a>
+        </li>
+        {% endif %}
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Ajustement du contenu à cause du fixed-top -->
+<div style="margin-top: 70px;"></div>
