@@ -5,30 +5,19 @@ pdf2docx
 APScheduler
 pypdf
 
-# --- Flask & Core ---
 Flask==3.0.3
 Flask-Login==0.6.3
-Flask-SQLAlchemy==3.1.1
-Flask-Migrate==4.0.7
-Werkzeug==3.0.3
 
-# --- Sécurité & Hashing ---
-bcrypt==4.1.2
-itsdangerous==2.2.0
 
-# --- Outils & Utilitaires ---
-requests==2.32.3
-python-dotenv==1.0.1
+
+
+
 
 # --- Compression & Conversion (si ton app en fait) ---
 Pillow==10.3.0
 moviepy==1.0.3
 pydub==0.25.1
 
-# --- Formatage / Analyse ---
-beautifulsoup4==4.12.3
-lxml==5.2.1
-
 # --- Déploiement & Serveur ---
 gunicorn==23.0.0
-waitress==3.0.1
+
