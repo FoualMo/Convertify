@@ -11,10 +11,10 @@ class SiteConfig:
     ADRESS = "XXXXXXXXXX"
 
     # Réseaux sociaux
-    FACEBOOK = "https://www.facebook.com/leomessi/?locale=fr_FR"
-    INSTAGRAM = "https://www.facebook.com/leomessi/?locale=fr_FR"
-    TWITTER = "https://www.facebook.com/leomessi/?locale=fr_FR"
+    FACEBOOK = "#"
+    INSTAGRAM = "#"
+    TWITTER = "#"
 
 
-    LINKEDIN = "https://www.facebook.com/leomessi/?locale=fr_FR"
-    GITHUB = "https://www.facebook.com/leomessi/?locale=fr_FR"
+    LINKEDIN = "#"
+    GITHUB = "#"
