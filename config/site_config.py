@@ -11,10 +11,10 @@ class SiteConfig:
     ADRESS = "XXXXXXXXXX"
 
     # Réseaux sociaux
-    FACEBOOK = "#"
-    INSTAGRAM = "#"
-    TWITTER = "#"
+    FACEBOOK = "##"
+    INSTAGRAM = "##"
+    TWITTER = "##"
 
 
-    LINKEDIN = "#"
-    GITHUB = "#"
+    LINKEDIN = "##"
+    GITHUB = "##"
