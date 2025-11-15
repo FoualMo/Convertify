@@ -1,0 +1,7 @@
+services:
+  - type: cron
+    name: keepalive
+    runtime: python
+    schedule: "*/5 * * * *"
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python cron.py"
